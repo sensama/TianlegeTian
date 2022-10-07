@@ -119,7 +119,7 @@ padding: 100 250;
 width:640px;
 height:100px;
 margin:0 auto;
-background:white;
+background:#c1bdbd;
 border-radius:20px;
 border:3px solid gray;
 }
@@ -139,7 +139,7 @@ height:80px;
 margin:20px 0px 3px 3px;
 position:absolute;
 padding:2px;
-border:2px solid white;
+border:5px solid gray;
 border-radius:20px;
 
 }
@@ -162,6 +162,10 @@ var BottomBox =[]
 var CancelBox=[]
 
 var BoxColor =['red','orange','yellow','green','blue','purple','gray'];
+
+var BoxImg =['1.png','2.png','3.png','4.png','5.png','6.png','7.png'];
+
+var BoxImgPath ='./img/pic/'
 
 var BottomBoxColorMap ={};
 
@@ -256,7 +260,8 @@ var initBoxValue =()=>{
 	 let length = BoxColor.length;
 	 let j=i%length;
 	 let background = BoxColor[j];
-	  InitBox=[...InitBox,{index:i,color:background}]
+	 let img = BoxImg[j]
+	  InitBox=[...InitBox,{index:i,color:background,img:img}]
 	 }
 }
 
@@ -285,7 +290,11 @@ var addBottomArea =(clearAreaNode,box)=>{
  let sort = box.getAttribute("sort");
  let background = InitBox[sort].color;
  bottomBoxDiv.className = "box";
- bottomBoxDiv.style.background=background;
+ 
+ //bottomBoxDiv.style.background=background;
+ 
+ bottomBoxDiv.style.backgroundImage = "url("+BoxImgPath+InitBox[sort].img+")";;
+ 
  console.log(bottomBoxDiv);
  clearAreaNode.appendChild(bottomBoxDiv);
  box.parentElement.removeChild(box);
@@ -413,7 +422,8 @@ for(let i=0;i<BoxSize;i++){
   let boxDiv = document.createElement("div");
    //box.innerHTML ='<div class ="box2" onclick="overBoxClick(this)"></div>'
   boxDiv.className ="box2";
-  boxDiv.style.background= InitBox[i].color;
+  //boxDiv.style.background= InitBox[i].color;
+  boxDiv.style.backgroundImage= "url("+BoxImgPath+InitBox[i].img+")";
   boxDiv.addEventListener("click",function(){
   //console.log(this);
     overBoxClick(this);
@@ -436,6 +446,7 @@ for(let i=0;i<BoxSize;i++){
   box.z=z;
   box.sort=i;
   box.color=InitBox[i].color;
+  box.img=InitBox[i].img;
   CoverBox =[...CoverBox,box]
   document.getElementById("coverArea").appendChild(boxDiv);
 }
