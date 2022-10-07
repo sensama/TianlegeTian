@@ -137,12 +137,12 @@ border-radius:20px;
 }
 
 .box2{	
-width:160px;
-height:160px;
-margin:600px 0px 3px 90px;
+width:150px;
+height:150px;
+margin:600px 0px 3px 15px;
 position:absolute;
-padding:7px;
-border:7px solid black;
+padding:0px;
+border:5px solid black;
 border-radius:20px;
 background-size: cover;
 
@@ -435,12 +435,12 @@ for(let i=0;i<BoxSize;i++){
   });
   let z =Math.floor(i/zSize);
   if(floorNum!=z){
-  randomNum =Math.ceil(Math.random()*300);
+  randomNum =Math.ceil(Math.random()*160);
   floorNum =z;
   }
   let k =i%zSize;
-  let x =k%xSize*90+randomNum;
-  let y =Math.floor(k/ySize)*90+randomNum;
+  let x =k%xSize*160+randomNum;
+  let y =Math.floor(k/ySize)*160+randomNum;
   boxDiv.style.left = x+"px";
   boxDiv.style.top = y+"px";
   boxDiv.style.zIndex = z;
