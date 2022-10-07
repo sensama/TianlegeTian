@@ -1,0 +1,456 @@
+<html>
+
+<head>
+   <meta charset="utf-8">
+</head>
+<body>
+<div id="coverArea" class="container">
+</div>
+
+<div id="freshArea" class="freshArea">
+<div class="freshButton" onclick=freshBox()>
+</div>
+</div>
+
+
+<div id="clearArea" class="bottom">
+
+
+<!-- <div class ="box"></div> -->
+<!-- <div class ="box"></div> -->
+
+
+</div>
+
+
+<div id="mesageArea" class="message">
+
+<h1>
+     游戏失败，请选择
+</h1>
+<div id ="buttonArea">
+<span class="mesageButton" onclick="restart()">重新开始</span>
+<span class="mesageButton">复活</span>
+</div>
+<!-- <div class="freshButton" onclick=freshBox()> -->
+<!-- </div> -->
+</div>
+
+
+<body>
+
+<style type="text/css">
+.container{
+margin:0 auto;
+width:835px;
+height:600px;
+background:#4e4d4d;
+position:relative;
+border:2px solid gray;
+border-radius:20px;
+}
+
+
+.freshArea{
+margin:-50 auto;
+width:100px;
+height:100px;
+//background:red;
+position:relative;
+z-index:20;
+left:330px;
+top:-100px;
+//float:right;
+}
+
+.freshButton{
+width:80px;
+height:80px;
+background-image:url('./img/index/fresh.png');
+border-radius:20px;
+}
+
+h1{
+margin: 0 auto;
+color: black;
+padding: 100 250;
+}
+
+#buttonArea{
+
+    margin: -100 auto;
+    width: 300px;
+    height: 50px;
+    background: white;
+
+}
+
+.message{
+    margin: -250 auto;
+    width: 800px;
+    height: 300px;
+    background: white;
+    position: relative;
+    z-index: -1;
+    left: 0px;
+    top: -100px;
+	//border:1px solid gray;
+	border-radius:20px;
+}
+
+
+.mesageButton{
+	margin: 0 auto;
+    width: 200px;
+    height: 50px;
+    background: gray;
+    color: white;
+    align-items: center;
+  
+    padding: 5 10 5 80;
+    position: relative;
+    top: -80px;
+    left: 10px;
+	border-radius:5px;
+
+}
+
+.bottom{
+width:640px;
+height:100px;
+margin:0 auto;
+background:white;
+border-radius:20px;
+border:3px solid gray;
+}
+
+.box{	
+width:80px;
+background:white;
+height:80px;
+margin:10px 0px 3px 8px;
+float:left;
+border-radius:20px;
+}
+
+.box2{	
+width:80px;
+height:80px;
+margin:20px 0px 3px 3px;
+position:absolute;
+padding:2px;
+border:2px solid white;
+border-radius:20px;
+
+}
+
+
+</style>
+<script>
+"use strict";
+
+//每个小方格的位置
+var  Box = {x:100,y:200,z:1,sort:1,color:"red"};
+
+//初始化的牌组
+var InitBox =[]
+//发牌后的牌组
+var CoverBox =[]
+//要消除的牌组
+var BottomBox =[]
+//要撤回的牌组
+var CancelBox=[]
+
+var BoxColor =['red','orange','yellow','green','blue','purple','gray'];
+
+var BottomBoxColorMap ={};
+
+var BoxSize =BoxColor.length*3*3*(Math.ceil(Math.random()*10));
+// 初始化的时候方格的数量
+var xSize =4;
+var ySize=4;
+
+//每层的数量
+var zSize =16;
+
+
+var initButtomBoxMap=()=>{
+    for(let i=0;i<BoxColor.length;i++){
+	  BottomBoxColorMap[BoxColor[i]]={count:0,index:[]};
+	}
+
+}
+
+var freshBox=()=>{
+  //洗牌
+  shuffle();
+  //清除覆盖区
+  clearContainer();
+  //清除覆盖区数据
+  resData();
+  createContainer();
+  
+}
+
+var clearContainer=()=>{
+ document.getElementById("coverArea").innerHTML="";
+}
+
+var resData=()=>{
+  BoxSize =InitBox.length;
+  CoverBox=[];
+}
+
+var restart=()=>{
+  
+ BottomBox=[];
+ initButtomBoxMap();
+ clearContainer();
+ clearBottomArea();
+ resData();
+ createContainer();
+ closeMesageBox();	
+}
+
+//关闭 消息对话框
+var closeMesageBox=()=>{
+document.getElementById("mesageArea").style.zIndex=-1;
+document.getElementById("mesageArea").style.border="0 solid gray";
+}
+
+//弹出 消息对话框
+var popMesageBox=()=>{
+document.getElementById("mesageArea").style.zIndex=200;
+document.getElementById("mesageArea").style.border="1px solid gray";
+}
+
+
+var clearBottomArea=()=>{
+document.getElementById("clearArea").innerHTML="";
+}
+
+
+
+var shuffle=()=>{
+   CoverBox = CoverBox.filter(element=>{
+     return element
+  })
+  console.log(CoverBox)
+  let newInitBox =[];
+  let length = CoverBox.length;
+  if(length%2==1){
+    newInitBox = [...newInitBox,CoverBox[length-1]]
+  }
+  let half = Math.floor(length/2);
+  for(let i=0;i<half;i++){
+     newInitBox=[...newInitBox,CoverBox[i+half],CoverBox[i]];
+  }
+  
+  InitBox = newInitBox;
+ 
+}
+
+
+var initBoxValue =()=>{
+     for(let i=0;i<BoxSize;i++){
+	 let length = BoxColor.length;
+	 let j=i%length;
+	 let background = BoxColor[j];
+	  InitBox=[...InitBox,{index:i,color:background}]
+	 }
+}
+
+var addBottomBox=(sort)=>{
+
+BottomBox =[...BottomBox,InitBox[sort]]
+}
+
+
+var addButtomBoxColorMap=(color)=>{
+ 
+  console.log("BottomBoxColorMap before :"+JSON.stringify(BottomBoxColorMap))
+ let count = BottomBoxColorMap[color].count;
+ let index =  BottomBoxColorMap[color].index;
+ count++;
+ index=[...index,BottomBox.length-1]
+ BottomBoxColorMap[color]={count:count,index:index}
+ console.log("BottomBoxColorMap after :"+JSON.stringify(BottomBoxColorMap))
+ 
+}
+
+
+var addBottomArea =(clearAreaNode,box)=>{
+
+ let bottomBoxDiv = document.createElement("div");
+ let sort = box.getAttribute("sort");
+ let background = InitBox[sort].color;
+ bottomBoxDiv.className = "box";
+ bottomBoxDiv.style.background=background;
+ console.log(bottomBoxDiv);
+ clearAreaNode.appendChild(bottomBoxDiv);
+ box.parentElement.removeChild(box);
+ 
+ addBottomBox(sort);
+ addButtomBoxColorMap(background);
+
+}
+
+var resetBottomBoxColorMap=()=>{
+    //重置原来的对象
+	for(let key in BottomBoxColorMap ){
+	   BottomBoxColorMap[key]={count:0,index:[]}
+	};
+	BottomBox.forEach((bottomBox,index)=>{
+	   let mapIndex=[];
+	   let bottomColor = bottomBox.color;
+	   let count=BottomBoxColorMap[bottomColor].count+1;
+	   mapIndex=[...BottomBoxColorMap[bottomColor].index,index];
+	   BottomBoxColorMap[bottomColor]={count:count,index:mapIndex};
+	})
+
+}
+
+var clearButtomBox =(clearAreaNode)=>{
+  let bottomLength  = BottomBox.length;
+  let color =BottomBox[bottomLength-1].color;
+  //console.log("lastcolor:"+color);
+   //console.log("BottomBoxColorMap:"+JSON.stringify(BottomBoxColorMap)) 
+  if(BottomBoxColorMap[color].count==3){
+       let children= clearAreaNode.children 
+	   let removeNode =[];
+         for(let i=0;i<children.length;i++){
+		       // console.log("bottomColor:"+BottomBox[i].color);
+				//console.log("color:"+color);
+		        if(BottomBox[i].color==color){
+				removeNode =[...removeNode,children[i]];
+				}
+	      }	
+		  
+		// console.log("ButtomBox:"+JSON.stringify(BottomBox)) 
+         for(let j=0;j<3;j++){
+		 //console.log("j:"+j);
+		// console.log("clearAreaNode:"+clearAreaNode);
+		// console.log("removeNode:"+JSON.stringify(removeNode));
+		 //console.log("removeNode:"+removeNode[j]);
+		 clearAreaNode.removeChild(removeNode[j]);
+		 //BottomBoxColorMap坐标不准确 换成下方的过滤写法
+		// BottomBox.splice(BottomBoxColorMap[color].index[2-j],1);
+		}
+		//	清除下方数组
+		BottomBox=BottomBox.filter((bottomBox)=>{
+		     return bottomBox.color!=color;
+		 });		
+       resetBottomBoxColorMap();  		 
+      // BottomBoxColorMap[color]={count:0,index:[]} 		  
+       console.log("ButtomBox  after :"+JSON.stringify(BottomBox)) 
+	   console.log("clean BottomBoxColorMap  after :"+JSON.stringify(BottomBoxColorMap)) 
+	 
+  }
+}
+
+var removeCoverBox =(e)=>{
+let sort = e.getAttribute("sort");
+delete CoverBox[sort];
+}
+
+var canClick =(box)=>{
+ let sort = box.getAttribute("sort");
+ let x= CoverBox[sort].x;
+ let y= CoverBox[sort].y;
+ let z = CoverBox[sort].z;
+ 
+ let cover = CoverBox.filter((item)=>{
+     let boxWidth = document.getElementsByClassName("box2")[0].offsetWidth;
+	 let boxHeight = document.getElementsByClassName("box2")[0].offsetHeight;
+     if(item){
+		 let x1= item.x;
+		 let y1= item.y;
+		 let z1 = item.z;
+		 console.log("x:%d,y:%d,z:%d",x,y,z)
+		 console.log("x1:%d,y:%d,z:%d",x1,y1,z1)
+      return Math.abs(x-x1)<boxWidth&&Math.abs(y-y1)<boxHeight&z<z1;
+	 }
+     return false; 
+ })
+ 
+ return cover.length==0;
+
+}
+
+
+var overBoxClick =(e)=>{
+let clearAreaNode = document.getElementById("clearArea");
+if(clearAreaNode.children.length>6){
+ 
+ popMesageBox();
+ return;
+ }
+ 
+ //判断该区域是否可以点击
+ if(!canClick(e))
+ {
+    return;
+ }
+
+// addNode
+addBottomArea(clearAreaNode,e);
+
+//removeCoverBox
+
+removeCoverBox(e);
+	
+//clearNode
+clearButtomBox(clearAreaNode);
+	
+}
+
+function createContainer(){
+
+ let floorNum =0;
+ //生成随机数
+ let randomNum = 20;
+for(let i=0;i<BoxSize;i++){
+  let boxDiv = document.createElement("div");
+   //box.innerHTML ='<div class ="box2" onclick="overBoxClick(this)"></div>'
+  boxDiv.className ="box2";
+  boxDiv.style.background= InitBox[i].color;
+  boxDiv.addEventListener("click",function(){
+  //console.log(this);
+    overBoxClick(this);
+  });
+  let z =Math.floor(i/zSize);
+  if(floorNum!=z){
+  randomNum =Math.ceil(Math.random()*100);
+  floorNum =z;
+  }
+  let k =i%zSize;
+  let x =k%xSize*90+randomNum+150;
+  let y =Math.floor(k/ySize)*90+randomNum;
+  boxDiv.style.left = x+"px";
+  boxDiv.style.top = y+"px";
+  boxDiv.style.zIndex = z;
+  boxDiv.setAttribute("sort",i)
+  let  box = {};
+  box.x=x;
+  box.y=y;
+  box.z=z;
+  box.sort=i;
+  box.color=InitBox[i].color;
+  CoverBox =[...CoverBox,box]
+  document.getElementById("coverArea").appendChild(boxDiv);
+}
+};
+
+var init=()=>{
+initBoxValue();
+initButtomBoxMap();
+createContainer();
+};
+
+//初始化
+init();
+
+</script>
+
+
+<html>
