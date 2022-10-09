@@ -36,7 +36,17 @@
 <!-- </div> -->
 </div>
 
+<audio id="three">
+<source type="audio/mpeg" src="./img-mobile/noise/eiyobucuoo.mp3">
+</audio>
 
+<audio id="success">
+<source type="audio/mpeg" src="./img-mobile/noise/geghaobangbang.mp3">
+</audio>
+
+<audio id="fail">
+<source type="audio/mpeg" src="./img-mobile/noise/haobeno.mp3">
+</audio>
 <body>
 
 <style type="text/css">
@@ -44,10 +54,12 @@
 margin:0 auto;
 width:1000px;
 height:2000px;
-background:#4e4d4d;
+//background:#4e4d4d;
 position:relative;
 border:2px solid gray;
 border-radius:20px;
+background-image:url('./img-mobile/index/background1.png');
+background-size: cover;
 }
 
 
@@ -66,7 +78,7 @@ top:-100px;
 .freshButton{
 width:80px;
 height:80px;
-background-image:url('./img/index/fresh.png');
+background-image:url('./img-mobile/index/fresh.png');
 border-radius:20px;
 position: relative;
 left: 100px;
@@ -84,7 +96,7 @@ padding: 100 250;
     margin: -100 auto;
     width: 600px;
     height: 100px;
-    background: white;
+   // background: white;
 
 }
 
@@ -121,7 +133,7 @@ padding: 100 250;
 width:640px;
 height:100px;
 margin:-250px auto;
-background:#c1bdbd;
+// background:#c1bdbd;
 border-radius:20px;
 border:3px solid gray;
 position:relative;
@@ -134,12 +146,13 @@ height:80px;
 margin:10px 0px 3px 8px;
 float:left;
 border-radius:20px;
+background-size: cover;
 }
 
 .box2{	
 width:150px;
 height:150px;
-margin:600px 0px 3px 15px;
+margin:600px 0px 3px 100px;
 position:absolute;
 padding:0px;
 border:5px solid black;
@@ -156,6 +169,7 @@ background-size: cover;
 //每个小方格的位置
 var  Box = {x:100,y:200,z:1,sort:1,color:"red"};
 
+
 //初始化的牌组
 var InitBox =[]
 //发牌后的牌组
@@ -165,22 +179,41 @@ var BottomBox =[]
 //要撤回的牌组
 var CancelBox=[]
 
-var BoxColor =['red','orange','yellow','green','blue','purple','gray','white'];
+var BoxColor =[];
 
-var BoxImg =['1.png','2.png','3.png','4.png','5.png','6.png','7.png','8.png'];
+var BoxImg =[];
 
-var BoxImgPath ='./img/pic/'
+var BoxImgPath ='./img-mobile/pic/'
 
 var BottomBoxColorMap ={};
 
 var BoxSize =BoxColor.length*3*3*(Math.ceil(Math.random()*10));
 // 初始化的时候方格的数量
-var xSize =5;
-var ySize=5;
+var xSize =4;
+var ySize=4;
 
 //每层的数量
-var zSize =25;
+var zSize =16;
 
+//关数
+var gate =1;
+
+var ImgSize=62;
+
+var Colors=['red','orange','yellow','green','blue','purple','gray','white'];
+
+
+
+var InitBoxImg=(start,end)=>{
+  BoxImg=[];
+  BoxColor=[];
+  for(let i=start;i<end;i++){
+  BoxImg =[...BoxImg,(i+1)+".png"]
+  BoxColor =[...BoxColor,Colors[i%8]];
+  }
+  BoxSize =BoxColor.length*3*3//*(Math.ceil(Math.random()*10));
+
+}
 
 var initButtomBoxMap=()=>{
     for(let i=0;i<BoxColor.length;i++){
@@ -324,6 +357,12 @@ var resetBottomBoxColorMap=()=>{
 
 }
 
+var playNoise =(type)=>{
+var myVideo=document.getElementById(type);
+myVideo.play();
+
+}
+
 var clearButtomBox =(clearAreaNode)=>{
   let bottomLength  = BottomBox.length;
   let color =BottomBox[bottomLength-1].color;
@@ -358,8 +397,41 @@ var clearButtomBox =(clearAreaNode)=>{
       // BottomBoxColorMap[color]={count:0,index:[]} 		  
        console.log("ButtomBox  after :"+JSON.stringify(BottomBox)) 
 	   console.log("clean BottomBoxColorMap  after :"+JSON.stringify(BottomBoxColorMap)) 
-	 
+	   let realCoverBox = CoverBox.filter(element=>{
+             return element
+          })
+		  
+       // 播放声音
+	   
+	   if(BottomBox.length==0&&realCoverBox.length==0){
+	     playNoise("success");
+	    if(gate==1){
+		
+		xSize =5;
+        ySize=5;
+
+        //每层的数量
+        zSize =25;
+		InitBoxImg(0,62);
+		
+		//BoxSize =BoxColor.length*3*3*(Math.ceil(Math.random()*10))
+		initBoxValue();
+		gate++;
+		restart();
+		changeBackGround();
+		console.log("进入下一关");
+		} else{ 
+		console.log("恭喜过关");
+	   }
+	 }else{
+	    playNoise("three");
+	 }
   }
+}
+
+var changeBackGround=()=>{
+ let backgroundDiv = document.getElementById("coverArea")
+ backgroundDiv.style.backgroundImage= "url('./img-mobile/index/backgroud2.png')";
 }
 
 var removeCoverBox =(e)=>{
@@ -396,6 +468,7 @@ var overBoxClick =(e)=>{
 let clearAreaNode = document.getElementById("clearArea");
 if(clearAreaNode.children.length>6){
  
+ playNoise("fail");
  popMesageBox();
  return;
  }
@@ -429,6 +502,13 @@ for(let i=0;i<BoxSize;i++){
   boxDiv.className ="box2";
   //boxDiv.style.background= InitBox[i].color;
   boxDiv.style.backgroundImage= "url("+BoxImgPath+InitBox[i].img+")";
+  
+  boxDiv.style.border="5px solid "+InitBox[i].color;
+  
+  if(gate==2){
+  boxDiv.style.margin="600px 0px 3px 15px"
+  }
+  
   boxDiv.addEventListener("click",function(){
   //console.log(this);
     overBoxClick(this);
@@ -458,6 +538,8 @@ for(let i=0;i<BoxSize;i++){
 };
 
 var init=()=>{
+//let 
+InitBoxImg(1,9);
 initBoxValue();
 initButtomBoxMap();
 createContainer();
